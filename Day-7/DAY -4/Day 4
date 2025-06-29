@@ -1,0 +1,68 @@
+
+# Question 1 (CSV)
+
+import csv
+data =  [
+    ["Name", "Age","College"],
+    ["Sname","S25","SKIT"],
+    ["Rname", "R23","RTU"]
+]
+with open("data.csv", "w", newline="") as file:
+    writer = csv.writer(file)
+    for x in data:
+        writer.writerow(x)
+print("CSV Created Successfully")
+
+# ==========================================================>>
+
+# Question 2 (Display Details)
+
+weather_list = [
+    {"city": "Delhi", "temperature": 42, "humidity": 18},
+    {"city": "Mumbai", "temperature": 33, "humidity": 70}
+]
+
+def show_weather(data):
+    print("Weather INFORMATIOn:\n")
+    for entry in data:
+        temp = entry['temperature']
+        hum = entry['humidity']
+        print(f"City: {entry['city']}\n -> Temp: {temp}°C | Humidity: {hum}%\n")
+
+show_weather(weather_list)
+
+
+# =============================================================>>
+
+#  Question 3 (DATABASE)
+
+import sqlite3
+
+conn = sqlite3.connect("db1.db")
+
+# Table 1
+
+conn.execute('''
+create table user(
+usid INTEGER PRIMARY KEY AUTOINCREMENT,
+usnm VARCHAR(200),
+pass VARCHAR(199),
+M_number VARCHAR(200),
+email VARCHAR(200)
+)
+''')
+# Table 2
+import sqlite3
+
+conn = sqlite3.connect("shop.db")
+
+conn.execute('''
+CREATE TABLE customer(
+    cid INTEGER PRIMARY KEY AUTOINCREMENT,
+    cname VARCHAR(150),
+    password VARCHAR(100),
+    phone VARCHAR(20),
+    email VARCHAR(150)
+)
+''')
+
