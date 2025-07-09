@@ -1,0 +1,48 @@
+
+
+ ASSIGNMENT  DAY-17
+============================================>>
+
+META TABLE
+-->>
+
+Name	Column	 Datatype
+User	 ID	     STRING
+User	Name	 STRING
+Employee  EmpID	STRING
+Empoyee	 EmpName	STRING
+
+-->>
+-->>
+
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DateType
+from collections import defaultdict
+
+df = spark.table('default.rawtable')
+display(df)
+
+table_columns = defaultdict(list)
+
+for x in df.collect():
+    table_name = x['Tables']
+    table_col = x['col']
+    col_type = x['type'].lower()
+
+    if col_type == 'string':
+        dtype = 'string'
+    elif col_type == 'integer':
+        dtype = 'int'
+    elif col_type == 'date':
+        dtype = 'date'
+    else:
+        dtype = 'string'
+
+    table_columns[table_name].append(f"{table_col} {dtype}")
+
+for table, cols in table_columns.items():
+    cols_str = ", ".join(cols)
+    query = f"CREATE OR REPLACE TABLE {table} ({cols_str})"
+    print(f"Running: {query}")
+    spark.sql(query)
+
+
