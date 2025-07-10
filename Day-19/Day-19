@@ -1,0 +1,30 @@
+
+
+ASSIGNMENT
+
+dbutils.widgets.text("process_name", "user_info")
+process_filter = dbutils.widgets.get("process_name")
+print(process_filter)
+
+df = spark.table('default.rawtabledata1')
+filtered_df = df.filter(df["process_name"] == process_filter)
+
+
+display(filtered_df)
+
+
+for row in filtered_df.collect():
+
+    if row["nullable"].strip().lower() == "not null":
+        where_condition = f"WHERE {row['col']} IS NOT NULL"
+    else:
+        where_condition = ""
+
+    insert_stmt = f"""
+    INSERT INTO {row["CuratedTableName"]} ({row["CurColumn"]})
+    SELECT {row["col"]}
+    FROM {row["Tables"]}
+    {where_condition}
+    """
+    print(insert_stmt)
+    spark.sql(insert_stmt)
