@@ -1,0 +1,35 @@
+
+                                Assignment
+
+------------------------------------------------------->>
+
+ Path--->>/Volumes/workspace/default/sales_data/saless.csv
+
+
+-->> df = spark.read.csv("/Volumes/workspace/default/sales_data/saless.csv", header=True, inferSchema=True)
+     display(df)
+
+-->> df.show(5)
+     df.printSchema()
+
+-->> filtered_df = df.filter(df["SALES"] > 1000)
+     display(filtered_df)
+
+-->> selected_df = filtered_df.select("MONTH_ID", "QTR_ID", "YEAR_ID", "CITY", "COUNTRY")
+      display(selected_df)
+
+-->> selected_df.write.format("delta").mode("append").saveAsTable("default.agg_sales_data")
+
+-->> spark.sql("DESCRIBE HISTORY default.agg_sales_data")
+     SELECT * FROM default.agg_sales_data;
+
+-->> CREATE VOLUME IF NOT EXISTS transformed_data;
+     df_transformed = df.filter((df.Attrition == "Yes") & (df.JobSatisfaction < 3)) \
+    .select("EmployeeNumber", "Age", "Department", "JobSatisfaction")
+
+df_transformed.write.format("delta").mode("overwrite") \
+    .partitionBy("Department") \
+    .save("/Volumes/workspace/default/skit/transformed_dats/high_attrition_risk_employee")
+
+
+
