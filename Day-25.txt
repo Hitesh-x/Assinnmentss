@@ -61,4 +61,4 @@ df_with_tenure.select("customer_id", "signup_date", "tenure_days").show(truncate
 
 spark.sql("SELECT * FROM customer_transformed_delta").show(truncate=False)
 
--->>
+-->> 
