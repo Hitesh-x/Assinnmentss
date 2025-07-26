@@ -1,0 +1,64 @@
+
+
+                                 ASSIGNMENTS
+
+------------------------------------------------------------------->>
+
+-->> display(dbutils.fs.ls("dbfs:/Volumes/workspace/default/zoomcar"))
+
+-->> #   Read the file in schema mode
+df = spark.read.option("multiline", "true").json("dbfs:/Volumes/workspace/default/zoomcar/zoom_car_customers_2024-07-17.json")
+df.show(truncate=False)
+df.printSchema()
+
+# df1 = spark.read.option("multiline", "true").json("dbfs:/Volumes/workspace/default/zoomcar/zoom_car_bookings_2024-07-17.json")
+# df1.show(truncate=False)
+# df1.printSchema()
+
+-->> df_customers_null = df.fillna("N.A")
+df_customers_null.show(truncate=False)
+df_customers_null.printSchema()
+
+-->> from pyspark.sql.functions import col
+
+df_valid_status = df_customers_null.filter(
+    col("status").isin("active", "inactive")
+)
+-->> df_customers_null.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("customer_table")
+
+spark.sql("SELECT * FROM customer_table")
+
+-->> spark.sql("SELECT * FROM customer_table").show(truncate=False)
+
+-->> #   Phone Number
+from pyspark.sql.functions import regexp_replace, expr
+
+df_cleaned_phone = df_valid_status.withColumn(
+    "phone_number",
+    expr("regexp_replace(phone_number, '\\D', '')")  # non-digits remove
+).withColumn(
+    "phone_number",
+    expr("regexp_replace(phone_number, '^0+', '')")  # leading zeros remove
+)
+
+
+df_cleaned_phone.select("customer_id", "phone_number").show(truncate=False)
+
+-->> from pyspark.sql.functions import current_date, datediff, col
+
+df_with_tenure = df_cleaned_phone.withColumn(
+    "tenure_days",
+    datediff(current_date(), col("signup_date").cast("date"))
+)
+
+df_with_tenure.select("customer_id", "signup_date", "tenure_days").show(truncate=False)
+
+-->> df_with_tenure.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("customer_transformed_delta")
+
+spark.sql("SELECT * FROM customer_transformed_delta").show(truncate=False)
+
+-->> 
